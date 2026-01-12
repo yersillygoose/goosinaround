@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rail Fence Cipher Puzzle</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        h1 { color: #2c3e50; text-align: center; }
+        .input-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        #rail-display { 
+            margin-top: 20px; 
+            font-family: monospace; 
+            white-space: pre; 
+            background: #272822; 
+            color: #f8f8f2; 
+            padding: 15px; 
+            border-radius: 6px; 
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+        .cipher-text { font-weight: bold; color: #e74c3c; word-break: break-all; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Rail Fence Puzzle</h1>
+    
+    <div class="input-group">
+        <label for="message">Your Secret Message:</label>
+        <textarea id="message" rows="3" placeholder="Type message here...">WE ARE DISCOVERED</textarea>
+    </div>
+
+    <div class="input-group">
+        <label for="rails">Number of Rails (2-6):</label>
+        <input type="number" id="rails" value="3" min="2" max="6">
+    </div>
+
+    <hr>
+
+    <label>Zigzag Visualization:</label>
+    <div id="rail-display"></div>
+
+    <label>Encoded Ciphertext:</label>
+    <div class="cipher-text" id="output"></div>
+</div>
+
+<script>
+    const messageInput = document.getElementById('message');
+    const railsInput = document.getElementById('rails');
+    const railDisplay = document.getElementById('rail-display');
+    const output = document.getElementById('output');
+
+    function updateCipher() {
+        let text = messageInput.value.replace(/\s/g, '').toUpperCase();
+        let numRails = parseInt(railsInput.value);
+        if (isNaN(numRails) || numRails < 2) numRails = 2;
+
+        // Initialize rails
+        let fence = Array.from({ length: numRails }, () => Array(text.length).fill('.'));
+        
+        // Fill zigzag
+        let rail = 0;
+        let direction = 1; // 1 for down, -1 for up
+
+        for (let i = 0; i < text.length; i++) {
+            fence[rail][i] = text[i];
+            rail += direction;
+            if (rail === 0 || rail === numRails - 1) direction *= -1;
+        }
+
+        // Display Visualization
+        railDisplay.textContent = fence.map(r => r.join(' ')).join('\n');
+
+        // Generate Output String
+        let ciphertext = fence.flat().filter(char => char !== '.').join('');
+        output.textContent = ciphertext;
+    }
+
+    messageInput.addEventListener('input', updateCipher);
+    railsInput.addEventListener('input', updateCipher);
+    updateCipher(); // Initial call
+</script>
+
+</body>
+</html>
